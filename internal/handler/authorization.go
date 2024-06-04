@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"GoBlog/internal/database"
+	"GoBlog/internal/database/models"
 	middlewares "GoBlog/internal/middleWares"
-	"GoBlog/internal/models"
+
 	"math/rand"
 	"regexp"
 	"strings"
@@ -11,8 +13,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func Entrance(email string, password string, users *[]models.User) (models.User, string) {
-	
+func Entrance(email string, password string) (models.User, string) {
+	users := database.GetUsers()
+
 	for _, user := range *users {
 		if user.Email == email {
 			pas := string(middlewares.PasswordHash(password))
@@ -26,7 +29,8 @@ func Entrance(email string, password string, users *[]models.User) (models.User,
 	return models.User{}, "Пользователь не найден"
 }
 
-func Registration(email string, name string, users *[]models.User) (string, bool) {
+func Registration(email string, name string) (string, bool) {
+	users := database.GetUsers()
 	nameValid := CheckValidName(name, users)
 	emailValid := CheckValidEmail(email)
 
