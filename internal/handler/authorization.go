@@ -34,8 +34,9 @@ func Registration(email string, name string) (string, bool) {
 	nameValid := CheckValidName(name, users)
 	emailValid := CheckValidEmail(email)
 
+	
 	if nameValid == "" {
-		if emailValid {
+		if emailValid == "" {
 
 			passwd := generatePassword(10)
 			Hashpasswd := string(middlewares.PasswordHash(passwd))
@@ -49,7 +50,7 @@ func Registration(email string, name string) (string, bool) {
 			return passwd, true
 
 		}else {
-			return "Почта имеет неверный вид", false
+			return emailValid, false
 		}
 		
 	}else {
@@ -90,15 +91,28 @@ func CheckValidName(name string, users *[]models.User) (string) {
 	}
 }
 
-func CheckValidEmail(email string) (bool) {
-	valid := false
-	for _, char := range email {
-		if char == '@' {
-			valid = true
-		}
-		if char == '.' {
-			valid = true
+func CheckValidEmail(email string) (string) {
+	validS := false
+	validT := false
+	users := database.GetUsers()
+
+	for _, user := range *users {
+		if user.Email == strings.ToLower(email) {
+			return "Такая почта уже зарегистрирована!"
 		}
 	}
-	return valid
+
+	for _, char := range email {
+		if char == '@' {
+			validS = true
+		}
+		if char == '.' {
+			validT = true
+		}
+	}
+	if validS && validT {
+		return ""
+	}else {
+		return "Почта имеет неверный формат!"
+	}
 }

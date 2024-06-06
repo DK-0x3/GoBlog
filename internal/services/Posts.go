@@ -11,6 +11,12 @@ import (
 	"github.com/fatih/color"
 )
 
+type ManagementPost interface {
+	ViewMyPosts()
+	ViewAllPosts()
+	AddPosts()
+}
+
 func ViewMyPosts() {
 	var fx bool = true
 	var myPost []models.Post
@@ -51,7 +57,8 @@ func ViewMyPosts() {
 
 		fmt.Print("\n\n[0] - Вернуться в профиль\n[1] - Прошлый пост\n[2] - Следующий пост\n[3] - Изменить пост\n[4] - Удалить пост\n\n")
 		
-		input := ReadInput()
+		var input string
+		fmt.Scan(&input)
 		if input == "1" {
 			if j <= 0 {
 				j = len(myPost) - 1
@@ -71,31 +78,37 @@ func ViewMyPosts() {
 
 			fmt.Print("\nИзменение Заголовка, введи новый заголовок\n*Если не нужно изменять введи '0'\n ")
 			newTitle = ReadInput()
-
+			if newTitle == "0" {
+				continue
+			}
 			fmt.Print("\nИзменение Текста, введи новый заголовок\n*Если не нужно изменять введи '0'\n ")
 			newText = ReadInput()
+			if newText == "0" {
+				continue
+			}
 
-			WritePost(models.Post{
-				Id: myPost[j].Id,
-				Title: newTitle,
-				Text: newText,
-			})
-
+			if database.UpdatePost(myPost[j].Id, newTitle, newText) {
+				PrintColorText(color.FgRed, "Ошибка добавления поста\n")
+				time.Sleep(2 * time.Second)
+				continue
+			}
+			
 			PrintColorText(color.FgGreen, "Пост успешно изменен!\n")
 			time.Sleep(2 * time.Second)
 
 		}else if input == "4" {
-			var del string
+			
 			fmt.Print("\nПост: " + myPost[j].Title + "\nУдалить этот пост? (д/н): ")
-			del = ReadInput()
+			var del string
+			fmt.Scan(&del)
 			if del == "д" {
-				DelPost(myPost[j].Id)
-				
+				database.DelPost(myPost[j].Id)
 				fmt.Print("Пост успешно удален!\n")
+				time.Sleep(2 * time.Second)
 			}else {
 				fmt.Print("Удаление отменено\n")
+				time.Sleep(2 * time.Second)
 			}
-
 		}else {
 			fx = false
 			break
@@ -127,7 +140,8 @@ func ViewAllPosts() {
 			fmt.Print("\n\n[0] - Вернуться\n[1] - Прошлый пост\n[2] - Следующий пост\n[3] - Написать комментарий\n")
 		}
 		
-		input := ReadInput()
+		var input string
+		fmt.Scan(&input)
 
 		if input == "1" {
 			if j <= 0 {
@@ -143,10 +157,10 @@ func ViewAllPosts() {
 			}
 		}else if input == "3" {
 			if database.ActiveUser.Name != "" {
-				var inputText string
-				fmt.Print("\nВведи комментарий: ")
-				inputText = ReadInput()
-				AddCommentPost(inputText, post[j].Id)
+				
+				fmt.Print("\nВведи комментарий: \n")
+				inputText := ReadInput()
+				database.AddCommentPost(inputText, post[j].Id)
 				fmt.Print("Ваш комментарий успешно добавлен!")
 				time.Sleep(2 * time.Second)
 			}
@@ -161,7 +175,6 @@ func AddPosts() {
 	for {
 		var titlePost string
 		var textPost string
-		posts := database.GetPosts()
 
 		PrintColorText(color.FgGreen, "Создание Нового поста\n*[0] - Вернуться в профиль\n\n")
 		
@@ -177,17 +190,12 @@ func AddPosts() {
 			break
 		}
 
-		*posts = append(*posts, models.Post{
-			Id:       database.ActiveUser.Name + "_" + string(len(*database.GetPosts())),
-			Title:    titlePost,
-			Text:     textPost,
-			DateTime: time.Now(),
-			Author:   database.ActiveUser,
-		})
+		database.AddPost(titlePost, textPost)
 
 		fmt.Print("Пост успешно создан!\n[0] - Вернуться в профиль\n[1] - Просмотр моих постов\n")
 
-		inp := ReadInput()
+		var inp string
+		fmt.Scan(&inp)
 		if inp == "1" {
 			ViewMyPosts()
 			break
@@ -195,29 +203,5 @@ func AddPosts() {
 			break
 		}
 				
-	}
-}
-
-func WritePost(postInfo models.Post) {
-	posts := database.GetPosts()
-	postsWrite := *posts
-	for indx, post := range *posts {
-		if post.Id == postInfo.Id {
-			if postInfo.Title != "0" {
-				postsWrite[indx].Title = postInfo.Title
-			}
-			if postInfo.Text != "0" {
-				postsWrite[indx].Text = postInfo.Text
-			}
-		}
-	}
-}
-
-func DelPost(postID string) {
-	posts := database.GetPosts()
-	for indx, post := range *posts {
-		if post.Id == postID {
-			*posts = append((*posts)[:indx], (*posts)[indx+1:]...)
-		}
 	}
 }

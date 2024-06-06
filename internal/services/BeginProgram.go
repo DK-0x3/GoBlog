@@ -18,7 +18,7 @@ func StartProgram(StartTitle string) {
 		PrintColorText(color.FgBlue, Title)
 
 		var action string
-		fmt.Scanln(&action)
+		fmt.Scan(&action)
 
 		switch action {
 		case "0":
@@ -45,12 +45,12 @@ func AuthorizationProfile() {
 		var password string
 		PrintColorText(color.FgGreen, "Вход\n\n*Вернуться назад - [0]\n\n")
 		fmt.Print("Введи Email: ")
-		fmt.Scanln(&email)
+		fmt.Scan(&email)
 		if email == "0" {
 			break
 		}
 		fmt.Print("Введи Пароль: ")
-		fmt.Scanln(&password)
+		fmt.Scan(&password)
 		if password == "0" {
 			break
 		}
@@ -61,7 +61,7 @@ func AuthorizationProfile() {
 			var input string
 			PrintColorText(color.FgRed, "Ошибка: "+err)
 			fmt.Print("\n[1] - Попробовать снова\n[0] - Вернуться на главную\nВаш выбор: ")
-			fmt.Scanln(&input)
+			fmt.Scan(&input)
 			if input == "0" {
 				break
 			} else if input == "1" {
@@ -81,7 +81,7 @@ func UserProfile() {
 		fmt.Print("\n[0] - Выход из профиля\n[1] - Просмотр и редактирование постов\n[2] - Создать новый пост\n[3] - Просмотр ленты постов\n")
 		
 		var inputProfile string
-		fmt.Scanln(&inputProfile)
+		fmt.Scan(&inputProfile)
 		if inputProfile == "0" {
 			break
 		} else if inputProfile == "1" {
@@ -103,13 +103,13 @@ func RegistrationProfile() {
 		var name string
 		PrintColorText(color.FgGreen, "Регистрация\n\n*Вернуться назад - [0]\n\n")
 		fmt.Print("Введи Email: ")
-		fmt.Scanln(&email)
+		fmt.Scan(&email)
 		if email == "0" {
 			break
 		}
 
 		fmt.Print("Введи Name: ")
-		fmt.Scanln(&name)
+		fmt.Scan(&name)
 		if name == "0" {
 			break
 		}
@@ -118,13 +118,13 @@ func RegistrationProfile() {
 		if registrValid {
 			PrintColorText(color.FgGreen, "Успешная регистрация!\nОсталось войти в профиль\n\n")
 			fmt.Printf("Ваш пароль: %s\n\nВведи что угодно для перехода на главную...\n", result)
-			fmt.Scanln(&result)
+			fmt.Scan(&result)
 			break
 		} else {
 			var input string
 			PrintColorText(color.FgRed, "Ошибка регистрации: "+result)
 			fmt.Print("\n[1] - Попробовать снова\n[0] - Вернуться на главную\nВаш выбор: ")
-			fmt.Scanln(&input)
+			fmt.Scan(&input)
 			if input == "0" {
 				break
 			} else if input == "1" {

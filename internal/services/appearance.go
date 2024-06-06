@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strings"
 
 	"github.com/fatih/color"
 )
@@ -30,11 +31,15 @@ func PrintColorText(colorText color.Attribute, text string) {
 }
 
 func ReadInput() string {
+	var x string
 	reader := bufio.NewReader(os.Stdin)
-
+	fmt.Scan(&x)
 	text, err := reader.ReadString('\n')
     if err != nil {
-        fmt.Println("Error reading input:", err)
+        fmt.Println("Ошибка ввода: ", err)
     }
-	return text
+	result := strings.ReplaceAll(x + " " + text, "\r\n", "")
+	return result
 }
+
+
