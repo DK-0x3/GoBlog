@@ -9,11 +9,18 @@ import (
 	"github.com/fatih/color"
 )
 
+// type BeginApp interface {
+// 	StartProgram(StartTitle string)
+// 	AuthorizationProfile()
+// 	UserProfile()
+// 	RegistrationProfile()
+// }
+
 func StartProgram(StartTitle string) {
 	database.InitDB()
 	for {
 		ClearScreen()
-		database.DelActiveUser()
+		iActiveUser.DelActiveUser()
 		Title := StartTitle + "\n\n[1] - Войти\n[2] - Зарегистрироваться\n[3] - Просмотр недавних постов пользователей\n[0] - завершить сеанс\nВведи команду: "
 		PrintColorText(color.FgBlue, Title)
 
@@ -55,11 +62,10 @@ func AuthorizationProfile() {
 			break
 		}
 		activUser, err := handler.Entrance(email, password)
-		database.PutActiveUser(activUser)
 
-		if err != "" {
+		if err != nil {
 			var input string
-			PrintColorText(color.FgRed, "Ошибка: "+err)
+			PrintColorText(color.FgRed, err.Error())
 			fmt.Print("\n[1] - Попробовать снова\n[0] - Вернуться на главную\nВаш выбор: ")
 			fmt.Scan(&input)
 			if input == "0" {
@@ -70,6 +76,9 @@ func AuthorizationProfile() {
 				break
 			}
 		}
+		
+		iActiveUser.PutActiveUser(activUser)
+
 		UserProfile()
 	}
 }
@@ -77,7 +86,7 @@ func AuthorizationProfile() {
 func UserProfile() {
 	for {
 		ClearScreen()
-		PrintColorText(color.FgGreen, "Добро пожаловать " + database.GetActiveUser().Name)
+		PrintColorText(color.FgGreen, "Добро пожаловать " + iActiveUser.GetActiveUser().Name)
 		fmt.Print("\n[0] - Выход из профиля\n[1] - Просмотр и редактирование постов\n[2] - Создать новый пост\n[3] - Просмотр ленты постов\n")
 		
 		var inputProfile string

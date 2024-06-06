@@ -4,7 +4,7 @@ import (
 	"GoBlog/internal/database"
 	"GoBlog/internal/database/models"
 	middlewares "GoBlog/internal/middleWares"
-
+	"errors"
 	"math/rand"
 	"regexp"
 	"strings"
@@ -13,24 +13,26 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func Entrance(email string, password string) (models.User, string) {
-	users := database.GetUsers()
+var iUser database.LocalUser
+
+func Entrance(email string, password string) (models.User, error) {
+	users := iUser.GetUsers()
 
 	for _, user := range *users {
 		if user.Email == email {
 			pas := string(middlewares.PasswordHash(password))
 			if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(pas)); err != nil {
-				return user, ""
+				return user, nil
 			}else {
-				return models.User{}, "Неверный пароль"
+				return models.User{}, errors.New("Неверный пароль")
 			}
 		}
 	}
-	return models.User{}, "Пользователь не найден"
+	return models.User{}, errors.New("Пользователь не найден")
 }
 
 func Registration(email string, name string) (string, bool) {
-	users := database.GetUsers()
+	users := iUser.GetUsers()
 	nameValid := CheckValidName(name, users)
 	emailValid := CheckValidEmail(email)
 
@@ -94,7 +96,7 @@ func CheckValidName(name string, users *[]models.User) (string) {
 func CheckValidEmail(email string) (string) {
 	validS := false
 	validT := false
-	users := database.GetUsers()
+	users := iUser.GetUsers()
 
 	for _, user := range *users {
 		if user.Email == strings.ToLower(email) {

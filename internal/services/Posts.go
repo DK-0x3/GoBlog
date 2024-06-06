@@ -11,6 +11,11 @@ import (
 	"github.com/fatih/color"
 )
 
+var iUser database.LocalUser
+var iPost database.LocalPost
+var iActiveUser database.LocalActiveUser
+var iComments database.LocalComment
+
 type ManagementPost interface {
 	ViewMyPosts()
 	ViewAllPosts()
@@ -20,10 +25,10 @@ type ManagementPost interface {
 func ViewMyPosts() {
 	var fx bool = true
 	var myPost []models.Post
-	posts := database.GetPosts()
-	activUser := database.GetActiveUser()
+	posts := *iPost.GetPosts()
+	activUser := iActiveUser.GetActiveUser()
 
-	for _, post := range *posts {
+	for _, post := range posts {
 			if post.Author.Name == activUser.Name {
 				myPost = append(myPost, post)
 			}
@@ -33,7 +38,7 @@ func ViewMyPosts() {
 
 	for fx {
 		myPost = nil
-		for _, post := range *posts {
+		for _, post := range posts {
 			if post.Author.Name == activUser.Name {
 				myPost = append(myPost, post)
 			}
@@ -47,8 +52,18 @@ func ViewMyPosts() {
 			j = len(myPost) - 1
 		}
 		PrintColorText(color.FgHiMagenta, strings.ToUpper(myPost[j].Title))
-		PrintColorText(color.FgHiCyan, "\n"+myPost[j].DateTime.Format("02.01.2006 15:04"))
-		fmt.Print("\n\n" + myPost[j].Text)
+		PrintColorText(color.FgHiCyan, "\n"+myPost[j].DateTime.Format("02.01.2006 15:04")+"\n")
+		count := 0
+		for _, s := range myPost[j].Text {
+			if count > 100 {
+				count = 0
+				fmt.Print("\n")
+			}
+			fmt.Print(string(s))
+			count++
+		}
+		//fmt.Print("\n\n" + myPost[j].Text)
+
 		fmt.Printf("\n\nКомментарии: %d ", len(myPost[j].Comments))
 		for _, komment := range myPost[j].Comments {
 			PrintColorText(color.FgGreen, "\n  " + komment.User.Name)
@@ -87,7 +102,8 @@ func ViewMyPosts() {
 				continue
 			}
 
-			if database.UpdatePost(myPost[j].Id, newTitle, newText) {
+			err := iPost.UpdatePost(myPost[j].Id, newTitle, newText)
+			if err != nil {
 				PrintColorText(color.FgRed, "Ошибка добавления поста\n")
 				time.Sleep(2 * time.Second)
 				continue
@@ -102,7 +118,7 @@ func ViewMyPosts() {
 			var del string
 			fmt.Scan(&del)
 			if del == "д" {
-				database.DelPost(myPost[j].Id)
+				iPost.DelPost(myPost[j].Id)
 				fmt.Print("Пост успешно удален!\n")
 				time.Sleep(2 * time.Second)
 			}else {
@@ -119,7 +135,7 @@ func ViewMyPosts() {
 
 func ViewAllPosts() {
 	var fx bool = true
-	var post []models.Post = *database.GetPosts()
+	var post []models.Post = *iPost.GetPosts()
 
 	var j int = len(post) - 1
 
@@ -127,8 +143,17 @@ func ViewAllPosts() {
 
 	for fx {
 		PrintColorText(color.FgHiMagenta, "\n" + strings.ToUpper(post[j].Title))
-		PrintColorText(color.FgHiCyan, "\n" + post[j].DateTime.Format("02.01.2006 15:04"))
-		fmt.Print("\n\n" + post[j].Text)
+		PrintColorText(color.FgHiCyan, "\n" + post[j].DateTime.Format("02.01.2006 15:04") + "\n")
+		count := 0
+		for _, s := range post[j].Text {
+			if count > 100 {
+				count = 0
+				fmt.Print("\n")
+			}
+			fmt.Print(string(s))
+			count++
+		}
+		
 		fmt.Printf("\n\nКомментарии: %d ", len(post[j].Comments))
 		for _, komment := range post[j].Comments {
 			PrintColorText(color.FgGreen, "\n  " + komment.User.Name)
@@ -160,7 +185,7 @@ func ViewAllPosts() {
 				
 				fmt.Print("\nВведи комментарий: \n")
 				inputText := ReadInput()
-				database.AddCommentPost(inputText, post[j].Id)
+				iComments.AddCommentPost(inputText, post[j].Id)
 				fmt.Print("Ваш комментарий успешно добавлен!")
 				time.Sleep(2 * time.Second)
 			}
@@ -190,7 +215,7 @@ func AddPosts() {
 			break
 		}
 
-		database.AddPost(titlePost, textPost)
+		iPost.AddPost(titlePost, textPost)
 
 		fmt.Print("Пост успешно создан!\n[0] - Вернуться в профиль\n[1] - Просмотр моих постов\n")
 

@@ -2,12 +2,38 @@ package database
 
 import (
 	"GoBlog/internal/database/models"
+	"errors"
 	"time"
 )
+
+type StartApp interface {
+	GetUsers()
+	GetPosts()
+	AddPost(title, text string)
+	UpdatePost(id, title, text string)
+	DelPost(ID string)
+	GetActiveUser()
+	PutActiveUser(user models.User)
+	DelActiveUser()
+	AddCommentPost(text string, postID string)
+}
 
 var Users []models.User
 var Posts []models.Post
 var ActiveUser models.User
+
+type LocalUser struct {
+	User models.User
+}
+type LocalPost struct {
+	Post models.Post
+}
+type LocalActiveUser struct {
+	ActiveUser models.User
+}
+type LocalComment struct {
+	Comment models.Comment
+}
 
 func InitDB() {
     comment := []models.Comment{}
@@ -43,15 +69,15 @@ func InitDB() {
 	})
 }
 
-func GetUsers() *[]models.User {
+func (u *LocalUser) GetUsers() *[]models.User {
 	return &Users
 }
 
-func GetPosts() *[]models.Post {
+func (p *LocalPost) GetPosts() *[]models.Post {
 	return &Posts
 }
 
-func AddPost(title, text string) {
+func (p *LocalPost) AddPost(title, text string) {
     if title == "" {
         title = "Пустой загаловок"
     }
@@ -67,7 +93,7 @@ func AddPost(title, text string) {
 	})
 }
 
-func UpdatePost(id, title, text string) bool {
+func (p *LocalPost) UpdatePost(id, title, text string) error {
     for indx, post := range Posts {
 		if post.Id == id {
 			if title != "" {
@@ -76,13 +102,13 @@ func UpdatePost(id, title, text string) bool {
 			if text != "" {
 				Posts[indx].Text = text
 			}
-            return true
+            return nil
 		}
 	}
-    return false
+    return errors.New("ошибка: пост не найден")
 }
 
-func DelPost(ID string) {
+func (p *LocalPost) DelPost(ID string) {
 	for indx, post := range Posts {
 		if post.Id == ID {
 			Posts = append(Posts[:indx], Posts[indx+1:]...)
@@ -90,19 +116,19 @@ func DelPost(ID string) {
 	}
 }
 
-func GetActiveUser() *models.User {
+func (p *LocalActiveUser) GetActiveUser() *models.User {
     return &ActiveUser
 }
 
-func PutActiveUser(user models.User) {
+func (p *LocalActiveUser) PutActiveUser(user models.User) {
     ActiveUser = user
 }
 
-func DelActiveUser() {
+func (p *LocalActiveUser) DelActiveUser() {
     ActiveUser = models.User{}
 }
 
-func AddCommentPost(text string, postID string) bool {
+func (p *LocalComment) AddCommentPost(text string, postID string) error {
 	for indx, postItem := range Posts {
 		if postItem.Id == postID {
 			Posts[indx].Comments = append(Posts[indx].Comments, models.Comment{
@@ -110,8 +136,8 @@ func AddCommentPost(text string, postID string) bool {
 				Text: text,
 				DateTime: time.Now(),
 			})
-			return true
+			return nil
 		}
 	}
-	return false
+	return errors.New("ошибка добавления комментария")
 }
