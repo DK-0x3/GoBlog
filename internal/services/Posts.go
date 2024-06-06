@@ -52,17 +52,19 @@ func ViewMyPosts() {
 			j = len(myPost) - 1
 		}
 		PrintColorText(color.FgHiMagenta, strings.ToUpper(myPost[j].Title))
-		PrintColorText(color.FgHiCyan, "\n"+myPost[j].DateTime.Format("02.01.2006 15:04")+"\n")
+		PrintColorText(color.FgHiCyan, "   " + myPost[j].DateTime.Format("02.01.2006 15:04")+"\n")
 		count := 0
 		for _, s := range myPost[j].Text {
 			if count > 100 {
-				count = 0
-				fmt.Print("\n")
+				if string(s) == " " {
+					count = 0
+					fmt.Print("\n")
+					continue
+				}
 			}
 			fmt.Print(string(s))
 			count++
 		}
-		//fmt.Print("\n\n" + myPost[j].Text)
 
 		fmt.Printf("\n\nКомментарии: %d ", len(myPost[j].Comments))
 		for _, komment := range myPost[j].Comments {
@@ -143,7 +145,7 @@ func ViewAllPosts() {
 
 	for fx {
 		PrintColorText(color.FgHiMagenta, "\n" + strings.ToUpper(post[j].Title))
-		PrintColorText(color.FgHiCyan, "\n" + post[j].DateTime.Format("02.01.2006 15:04") + "\n")
+		PrintColorText(color.FgHiCyan, "   " + post[j].DateTime.Format("02.01.2006 15:04") + "\n")
 		count := 0
 		for _, s := range post[j].Text {
 			if count > 100 {
@@ -153,7 +155,8 @@ func ViewAllPosts() {
 			fmt.Print(string(s))
 			count++
 		}
-		
+		PrintColorText(color.FgHiBlue, "\nАвтор: "+post[j].Author.Name)
+
 		fmt.Printf("\n\nКомментарии: %d ", len(post[j].Comments))
 		for _, komment := range post[j].Comments {
 			PrintColorText(color.FgGreen, "\n  " + komment.User.Name)

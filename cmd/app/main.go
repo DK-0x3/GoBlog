@@ -6,7 +6,6 @@ import (
 
 func main() {
     services.StartProgram("Привет! ")
-	
 }
 
 

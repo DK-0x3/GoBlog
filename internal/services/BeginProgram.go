@@ -5,16 +5,10 @@ import (
 	"GoBlog/internal/handler"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/fatih/color"
 )
-
-// type BeginApp interface {
-// 	StartProgram(StartTitle string)
-// 	AuthorizationProfile()
-// 	UserProfile()
-// 	RegistrationProfile()
-// }
 
 func StartProgram(StartTitle string) {
 	database.InitDB()
@@ -41,6 +35,7 @@ func StartProgram(StartTitle string) {
 			ViewAllPosts()
 		default:
 			fmt.Print("Неверный ввод, такой команды не найдено")
+			time.Sleep(2 * time.Second)
 		}
 	}
 }
@@ -76,7 +71,7 @@ func AuthorizationProfile() {
 				break
 			}
 		}
-		
+
 		iActiveUser.PutActiveUser(activUser)
 
 		UserProfile()

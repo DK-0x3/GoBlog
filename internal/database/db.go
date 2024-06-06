@@ -49,8 +49,8 @@ func InitDB() {
 
     Posts = append(Posts, models.Post{
         Id: "xxxx_1",
-        Title: "xz",
-        Text: "хз зачем это надо",
+        Title: "Есенин С. А. - «Ветер веет с юга и луна взошла»",
+        Text: "Ветер веет с юга И луна взошла, Что же ты, блядюга, Ночью не пришла? Не пришла ты ночью, Не явилась днем. Думаешь, мы дрочим? Нет! Других ебём!",
         DateTime: time.Now(),
         Author: models.User{Name: "xxxx", Email: "zzz@com"},
         Comments: comment,
