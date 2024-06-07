@@ -39,11 +39,11 @@ func InitDB() {
     comment := []models.Comment{}
     comment = append(comment, models.Comment{
                 User: models.User{
-		            Name: "xxxx",
-		            Email: "@.x",
-		            Password: "xxx",
+		            Name: "zzz",
+		            Email: "zzz@com",
+		            Password: "zzz",
 	            },
-                Text: "[pdgfpkpof]",
+                Text: "Классный стих!",
                 DateTime: time.Now(),
             })
 
@@ -52,18 +52,18 @@ func InitDB() {
         Title: "Есенин С. А. - «Ветер веет с юга и луна взошла»",
         Text: "Ветер веет с юга И луна взошла, Что же ты, блядюга, Ночью не пришла? Не пришла ты ночью, Не явилась днем. Думаешь, мы дрочим? Нет! Других ебём!",
         DateTime: time.Now(),
-        Author: models.User{Name: "xxxx", Email: "zzz@com"},
+        Author: models.User{Name: "xxx", Email: "@.x"},
         Comments: comment,
     })
     Posts = append(Posts, models.Post{
         Id: "xxxx_2",
-        Title: "ccc",
-        Text: "sdfsdghfdvо",
+        Title: "Тест",
+        Text: "Тестовый текст",
         DateTime: time.Now(),
-        Author: models.User{Name: "xxxx", Email: "zzz@com"},
+        Author: models.User{Name: "zzz", Email: "zzz@com"},
     })
 	Users = append(Users, models.User{
-		Name: "xxxx",
+		Name: "xxx",
 		Email: "@.x",
 		Password: "xxx",
 	})
