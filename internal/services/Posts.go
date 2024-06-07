@@ -151,6 +151,7 @@ func ViewAllPosts() {
 			if count > 100 {
 				count = 0
 				fmt.Print("\n")
+				continue
 			}
 			fmt.Print(string(s))
 			count++
@@ -186,6 +187,76 @@ func ViewAllPosts() {
 		}else if input == "3" {
 			if database.ActiveUser.Name != "" {
 				
+				fmt.Print("\nВведи комментарий: \n")
+				inputText := ReadInput()
+				iComments.AddCommentPost(inputText, post[j].Id)
+				fmt.Print("Ваш комментарий успешно добавлен!")
+				time.Sleep(2 * time.Second)
+			}
+		}else {
+			fx = false
+			break
+		}
+	}
+}
+
+func ViewTimePosts(startTime, endTime time.Time) {
+	var fx bool = true
+	var postAll []models.Post = *iPost.GetPosts()
+	var post []models.Post
+
+	for _, postX := range postAll {
+		if (postX.DateTime.Format("2006-01-02") <= startTime.Format("2006-01-02")) && (postX.DateTime.Format("2006-01-02") >= endTime.Format("2006-01-02")) {
+			post = append(post, postX)
+		}
+	}
+	var j int = len(post) - 1
+
+	PrintColorText(color.FgHiYellow, "\nПосты в это время:\n\n")
+
+	for fx {
+		PrintColorText(color.FgHiMagenta, "\n" + strings.ToUpper(post[j].Title))
+		PrintColorText(color.FgHiCyan, "   " + post[j].DateTime.Format("02.01.2006 15:04") + "\n")
+		count := 0
+		for _, s := range post[j].Text {
+			if count > 100 {
+				count = 0
+				fmt.Print("\n")
+				continue
+			}
+			fmt.Print(string(s))
+			count++
+		}
+		PrintColorText(color.FgHiBlue, "\nАвтор: "+post[j].Author.Name)
+
+		fmt.Printf("\n\nКомментарии: %d ", len(post[j].Comments))
+		for _, komment := range post[j].Comments {
+			PrintColorText(color.FgGreen, "\n  " + komment.User.Name)
+			fmt.Print("\n    " + komment.Text + "\n    " + komment.DateTime.Format("02.01.2006 15:04"))
+		}
+		if database.ActiveUser.Name == "" {
+			fmt.Print("\n\n[0] - Вернуться\n[1] - Прошлый пост\n[2] - Следующий пост\n")
+		}else {
+			fmt.Print("\n\n[0] - Вернуться\n[1] - Прошлый пост\n[2] - Следующий пост\n[3] - Написать комментарий\n")
+		}
+		
+		var input string
+		fmt.Scan(&input)
+
+		if input == "1" {
+			if j <= 0 {
+				j = len(post) - 1
+			} else {
+				j--
+			}
+		} else if input == "2" {
+			if j >= len(post)-1 {
+				j = 0
+			} else {
+				j++
+			}
+		}else if input == "3" {
+			if database.ActiveUser.Name != "" {
 				fmt.Print("\nВведи комментарий: \n")
 				inputText := ReadInput()
 				iComments.AddCommentPost(inputText, post[j].Id)
